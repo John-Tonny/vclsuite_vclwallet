@@ -7,10 +7,10 @@ package wallet
 import (
 	"testing"
 
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcwallet/waddrmgr"
+	"github.com/John-Tonny/vclsuite_vcld/txscript"
+	"github.com/John-Tonny/vclsuite_vcld/wire"
+	vclutil "github.com/John-Tonny/vclsuite_vclutil"
+	"github.com/John-Tonny/vclsuite_vclwallet/waddrmgr"
 )
 
 // TestComputeInputScript checks that the wallet can create the full
@@ -95,7 +95,7 @@ func runTestCase(t *testing.T, w *Wallet, scope waddrmgr.KeyScope,
 	outgoingTx.TxIn[0].Witness = witness
 	outgoingTx.TxIn[0].SignatureScript = script
 	err = validateMsgTx(
-		outgoingTx, [][]byte{utxOut.PkScript}, []btcutil.Amount{100000},
+		outgoingTx, [][]byte{utxOut.PkScript}, []vclutil.Amount{100000},
 	)
 	if err != nil {
 		t.Fatalf("error validating tx: %v", err)

@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/btcsuite/btcwallet/walletdb"
-	"github.com/btcsuite/btcwallet/walletdb/migration"
+	"github.com/John-Tonny/vclsuite_vclwallet/walletdb"
+	"github.com/John-Tonny/vclsuite_vclwallet/walletdb/migration"
 	"github.com/davecgh/go-spew/spew"
 )
 

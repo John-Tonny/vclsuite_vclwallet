@@ -8,13 +8,13 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcutil/psbt"
-	"github.com/btcsuite/btcwallet/wallet/txauthor"
-	"github.com/btcsuite/btcwallet/wallet/txrules"
-	"github.com/btcsuite/btcwallet/wtxmgr"
+	"github.com/John-Tonny/vclsuite_vcld/txscript"
+	"github.com/John-Tonny/vclsuite_vcld/wire"
+	vclutil "github.com/John-Tonny/vclsuite_vclutil"
+	"github.com/John-Tonny/vclsuite_vclutil/psbt"
+	"github.com/John-Tonny/vclsuite_vclwallet/wallet/txauthor"
+	"github.com/John-Tonny/vclsuite_vclwallet/wallet/txrules"
+	"github.com/John-Tonny/vclsuite_vclwallet/wtxmgr"
 )
 
 // FundPsbt creates a fully populated PSBT packet that contains enough inputs to
@@ -34,7 +34,7 @@ import (
 // selected/validated inputs by this method. It is in the caller's
 // responsibility to lock the inputs before handing the partial transaction out.
 func (w *Wallet) FundPsbt(packet *psbt.Packet, account uint32,
-	feeSatPerKB btcutil.Amount) (int32, error) {
+	feeSatPerKB vclutil.Amount) (int32, error) {
 
 	// Make sure the packet is well formed. We only require there to be at
 	// least one output but not necessarily any inputs.
@@ -149,7 +149,7 @@ func (w *Wallet) FundPsbt(packet *psbt.Packet, account uint32,
 			utxo := packet.Inputs[idx].WitnessUtxo
 			credits[idx] = wtxmgr.Credit{
 				OutPoint: in.PreviousOutPoint,
-				Amount:   btcutil.Amount(utxo.Value),
+				Amount:   vclutil.Amount(utxo.Value),
 				PkScript: utxo.PkScript,
 			}
 		}
@@ -335,10 +335,10 @@ func constantInputSource(eligible []wtxmgr.Credit) txauthor.InputSource {
 	// Current inputs and their total value. These won't change over
 	// different invocations as we want our inputs to remain static since
 	// they're selected by the user.
-	currentTotal := btcutil.Amount(0)
+	currentTotal := vclutil.Amount(0)
 	currentInputs := make([]*wire.TxIn, 0, len(eligible))
 	currentScripts := make([][]byte, 0, len(eligible))
-	currentInputValues := make([]btcutil.Amount, 0, len(eligible))
+	currentInputValues := make([]vclutil.Amount, 0, len(eligible))
 
 	for _, credit := range eligible {
 		nextInput := wire.NewTxIn(&credit.OutPoint, nil, nil)
@@ -348,8 +348,8 @@ func constantInputSource(eligible []wtxmgr.Credit) txauthor.InputSource {
 		currentInputValues = append(currentInputValues, credit.Amount)
 	}
 
-	return func(target btcutil.Amount) (btcutil.Amount, []*wire.TxIn,
-		[]btcutil.Amount, [][]byte, error) {
+	return func(target vclutil.Amount) (vclutil.Amount, []*wire.TxIn,
+		[]vclutil.Amount, [][]byte, error) {
 
 		return currentTotal, currentInputs, currentInputValues,
 			currentScripts, nil

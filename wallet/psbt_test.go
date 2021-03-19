@@ -10,11 +10,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcutil/psbt"
-	"github.com/btcsuite/btcwallet/waddrmgr"
+	"github.com/John-Tonny/vclsuite_vcld/txscript"
+	"github.com/John-Tonny/vclsuite_vcld/wire"
+	vclutil "github.com/John-Tonny/vclsuite_vclutil"
+	"github.com/John-Tonny/vclsuite_vclutil/psbt"
+	"github.com/John-Tonny/vclsuite_vclwallet/waddrmgr"
 )
 
 var (
@@ -76,7 +76,7 @@ func TestFundPsbt(t *testing.T) {
 	testCases := []struct {
 		name             string
 		packet           *psbt.Packet
-		feeRateSatPerKB  btcutil.Amount
+		feeRateSatPerKB  vclutil.Amount
 		expectedErr      string
 		validatePackage  bool
 		expectedFee      int64
@@ -403,7 +403,7 @@ func TestFinalizePsbt(t *testing.T) {
 	// Finally verify that the created witness is valid.
 	err = validateMsgTx(
 		finalTx, [][]byte{utxOutP2WKH.PkScript, utxOutNP2WKH.PkScript},
-		[]btcutil.Amount{1000000, 1000000},
+		[]vclutil.Amount{1000000, 1000000},
 	)
 	if err != nil {
 		t.Fatalf("error validating tx: %v", err)

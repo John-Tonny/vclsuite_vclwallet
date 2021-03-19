@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/btcsuite/btcwallet/walletdb"
+	"github.com/John-Tonny/vclsuite_vclwallet/walletdb"
 )
 
 // errSubTestFail is used to signal that a sub test returned false.

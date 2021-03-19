@@ -4,6 +4,6 @@
 
 package main
 
-import "github.com/btcsuite/btcwallet/netparams"
+import "github.com/John-Tonny/vclsuite_vclwallet/netparams"
 
 var activeNet = &netparams.MainNetParams

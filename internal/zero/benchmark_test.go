@@ -7,7 +7,7 @@ package zero_test
 import (
 	"testing"
 
-	. "github.com/btcsuite/btcwallet/internal/zero"
+	. "github.com/John-Tonny/vclsuite_vclwallet/internal/zero"
 )
 
 var (

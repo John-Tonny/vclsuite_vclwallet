@@ -19,9 +19,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/btcsuite/btcd/btcjson"
-	"github.com/btcsuite/btcwallet/chain"
-	"github.com/btcsuite/btcwallet/wallet"
+	"github.com/John-Tonny/vclsuite_vcld/btcjson"
+	"github.com/John-Tonny/vclsuite_vclwallet/chain"
+	"github.com/John-Tonny/vclsuite_vclwallet/wallet"
 	"github.com/btcsuite/websocket"
 )
 
@@ -81,7 +81,7 @@ type Server struct {
 
 // jsonAuthFail sends a message back to the client if the http auth is rejected.
 func jsonAuthFail(w http.ResponseWriter) {
-	w.Header().Add("WWW-Authenticate", `Basic realm="btcwallet RPC"`)
+	w.Header().Add("WWW-Authenticate", `Basic realm="vclwallet RPC"`)
 	http.Error(w, "401 Unauthorized.", http.StatusUnauthorized)
 }
 
@@ -265,7 +265,7 @@ func (s *Server) SetChainServer(chainClient chain.Interface) {
 }
 
 // handlerClosure creates a closure function for handling requests of the given
-// method.  This may be a request that is handled directly by btcwallet, or
+// method.  This may be a request that is handled directly by vclwallet, or
 // a chain server request that is handled by passing the request down to btcd.
 //
 // NOTE: These handlers do not handle special cases, such as the authenticate
@@ -462,7 +462,7 @@ out:
 			switch req.Method {
 			case "stop":
 				resp := makeResponse(req.ID,
-					"btcwallet stopping.", nil)
+					"vclwallet stopping.", nil)
 				mresp, err := json.Marshal(resp)
 				// Expected to never fail.
 				if err != nil {
@@ -481,7 +481,8 @@ out:
 				wsc.wg.Add(1)
 				go func() {
 					resp, jsonErr := f()
-					mresp, err := btcjson.MarshalResponse(req.ID, resp, jsonErr)
+					var rpcVersion btcjson.RPCVersion = btcjson.RpcVersion1
+					mresp, err := btcjson.MarshalResponse(rpcVersion, req.ID, resp, jsonErr)
 					if err != nil {
 						log.Errorf("Unable to marshal response: %v", err)
 					} else {
@@ -578,9 +579,10 @@ func (s *Server) postClientRPC(w http.ResponseWriter, r *http.Request) {
 	// processing.  While checking the methods, disallow authenticate
 	// requests, as they are invalid for HTTP POST clients.
 	var req btcjson.Request
+	var rpcVersion btcjson.RPCVersion = btcjson.RpcVersion1
 	err = json.Unmarshal(rpcRequest, &req)
 	if err != nil {
-		resp, err := btcjson.MarshalResponse(req.ID, nil, btcjson.ErrRPCInvalidRequest)
+		resp, err := btcjson.MarshalResponse(rpcVersion, req.ID, nil, btcjson.ErrRPCInvalidRequest)
 		if err != nil {
 			log.Errorf("Unable to marshal response: %v", err)
 			http.Error(w, "500 Internal Server Error",
@@ -606,13 +608,12 @@ func (s *Server) postClientRPC(w http.ResponseWriter, r *http.Request) {
 		return
 	case "stop":
 		stop = true
-		res = "btcwallet stopping"
+		res = "vclwallet stopping"
 	default:
 		res, jsonErr = s.handlerClosure(&req)()
 	}
-
 	// Marshal and send.
-	mresp, err := btcjson.MarshalResponse(req.ID, res, jsonErr)
+	mresp, err := btcjson.MarshalResponse(rpcVersion, req.ID, res, jsonErr)
 	if err != nil {
 		log.Errorf("Unable to marshal response: %v", err)
 		http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)

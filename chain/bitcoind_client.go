@@ -9,14 +9,14 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/btcsuite/btcd/btcjson"
-	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/btcsuite/btcd/chaincfg/chainhash"
-	"github.com/btcsuite/btcd/txscript"
-	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcwallet/waddrmgr"
-	"github.com/btcsuite/btcwallet/wtxmgr"
+	"github.com/John-Tonny/vclsuite_vcld/btcjson"
+	"github.com/John-Tonny/vclsuite_vcld/chaincfg"
+	"github.com/John-Tonny/vclsuite_vcld/chaincfg/chainhash"
+	"github.com/John-Tonny/vclsuite_vcld/txscript"
+	"github.com/John-Tonny/vclsuite_vcld/wire"
+	vclutil "github.com/John-Tonny/vclsuite_vclutil"
+	"github.com/John-Tonny/vclsuite_vclwallet/waddrmgr"
+	"github.com/John-Tonny/vclsuite_vclwallet/wtxmgr"
 )
 
 var (
@@ -220,7 +220,7 @@ func (c *BitcoindClient) Notifications() <-chan interface{} {
 // transaction pays to any of the given addresses.
 //
 // NOTE: This is part of the chain.Interface interface.
-func (c *BitcoindClient) NotifyReceived(addrs []btcutil.Address) error {
+func (c *BitcoindClient) NotifyReceived(addrs []vclutil.Address) error {
 	c.NotifyBlocks()
 
 	select {
@@ -315,10 +315,10 @@ func (c *BitcoindClient) shouldNotifyBlocks() bool {
 // is used to reset the current filters.
 //
 // The current filters supported are of the following types:
-//	[]btcutil.Address
+//	[]vclutil.Address
 //	[]wire.OutPoint
 //	[]*wire.OutPoint
-//	map[wire.OutPoint]btcutil.Address
+//	map[wire.OutPoint]vclutil.Address
 //	[]chainhash.Hash
 //	[]*chainhash.Hash
 func (c *BitcoindClient) LoadTxFilter(reset bool, filters ...interface{}) error {
@@ -345,8 +345,8 @@ func (c *BitcoindClient) LoadTxFilter(reset bool, filters ...interface{}) error 
 	// filter types, and the second to actually update our filters.
 	for _, filter := range filters {
 		switch filter := filter.(type) {
-		case []btcutil.Address, []wire.OutPoint, []*wire.OutPoint,
-			map[wire.OutPoint]btcutil.Address, []chainhash.Hash,
+		case []vclutil.Address, []wire.OutPoint, []*wire.OutPoint,
+			map[wire.OutPoint]vclutil.Address, []chainhash.Hash,
 			[]*chainhash.Hash:
 
 			// Proceed to check the next filter type.
@@ -413,7 +413,7 @@ func (c *BitcoindClient) RescanBlocks(
 // Rescan rescans from the block with the given hash until the current block,
 // after adding the passed addresses and outpoints to the client's watch list.
 func (c *BitcoindClient) Rescan(blockHash *chainhash.Hash,
-	addresses []btcutil.Address, outPoints map[wire.OutPoint]btcutil.Address) error {
+	addresses []vclutil.Address, outPoints map[wire.OutPoint]vclutil.Address) error {
 
 	// A block hash is required to use as the starting point of the rescan.
 	if blockHash == nil {
@@ -531,7 +531,7 @@ func (c *BitcoindClient) rescanHandler() {
 				c.watchMtx.Unlock()
 
 			// We're adding the addresses to our filter.
-			case []btcutil.Address:
+			case []vclutil.Address:
 				c.watchMtx.Lock()
 				for _, addr := range update {
 					c.watchedAddresses[addr.String()] = struct{}{}
@@ -554,7 +554,7 @@ func (c *BitcoindClient) rescanHandler() {
 
 			// We're adding the outpoints that map to the scripts
 			// that we should scan for to our filter.
-			case map[wire.OutPoint]btcutil.Address:
+			case map[wire.OutPoint]vclutil.Address:
 				c.watchMtx.Lock()
 				for op := range update {
 					c.watchedOutPoints[op] = struct{}{}
@@ -1224,7 +1224,7 @@ func (c *BitcoindClient) filterTx(tx *wire.MsgTx,
 	blockDetails *btcjson.BlockDetails,
 	notify bool) (bool, *wtxmgr.TxRecord, error) {
 
-	txDetails := btcutil.NewTx(tx)
+	txDetails := vclutil.NewTx(tx)
 	if blockDetails != nil {
 		txDetails.SetIndex(blockDetails.Index)
 	}
